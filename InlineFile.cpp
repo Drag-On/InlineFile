@@ -52,9 +52,13 @@ int main(int argc, char *argv[])
     }
     // Write data
     output << "constexpr unsigned int size = " << filesize << ";" << endl;
-    output << "constexpr char data[] = { ";
+    output << "constexpr char data[] = {" << endl << "    ";
     for(unsigned int i = 0; i < filesize; i++)
+    {
 	output << static_cast<int>(data[i]) << ", ";
+	if(i % 24 == 23)
+	    output << endl << "    ";
+    }
     output << "};" << endl;
     output.close();
     delete [] data;
