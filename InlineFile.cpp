@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     // Check for correct arguments
     if(argc != 3)
     {
-	cout << "Usage: InlineFile Input Output." << endl;
+	cout << "Usage: \"InlineFile Input Output\"." << endl;
 	cout << "       Input: Filename of the file to convert." << endl;
 	cout << "       Output: Filename of the file to write to." << endl;
 	cout << "       The output file will be clobbered." << endl;
@@ -32,14 +32,14 @@ int main(int argc, char *argv[])
     // Else read in data
     unsigned int filesize = input.tellg();
     input.seekg(0, ifstream::beg);
-    char* data = new char[filesize];
+    unsigned char* data = new unsigned char[filesize];
     if(!data)
     {
 	cerr << "Unable to allocate enough memory!" << endl;
 	input.close();
 	return 1;
     }
-    input.read(data, filesize);
+    input.read(reinterpret_cast<char*>(data), filesize);
     input.close();
     // Open output file
     ofstream output{argv[2], ofstream::out | ofstream::trunc};
@@ -52,14 +52,14 @@ int main(int argc, char *argv[])
     }
     // Write data
     output << "constexpr unsigned int size = " << filesize << ";" << endl;
-    output << "constexpr char data[] = {" << endl << "    ";
+    output << "constexpr unsigned char data[] = {";
     for(unsigned int i = 0; i < filesize; i++)
     {
-	output << static_cast<int>(data[i]) << ", ";
-	if(i % 24 == 23)
+	if(i % 24 == 0)
 	    output << endl << "    ";
+	output << static_cast<int>(data[i]) << ", ";
     }
-    output << "};" << endl;
+    output << endl << "};" << endl;
     output.close();
     delete [] data;
 
